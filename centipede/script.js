@@ -292,7 +292,6 @@ var Input = {
       this.rThresh = rThresh; //Maximum angle difference before rotation
       this.children = [];
       this.systems = [];
-      this.bounceTime = 0; //For head bouncing animation
     }
     follow(x, y) {
       var dist = ((this.x - x) ** 2 + (this.y - y) ** 2) ** 0.5;
@@ -339,66 +338,28 @@ var Input = {
       this.draw(true);
     }
     draw(iter) {
-      var r = 32;
-      
-      // Add bouncing animation to head, intensity based on movement speed
-      this.bounceTime += 0.05;
-      var bounceIntensity = Math.min(this.speed * 0.15, 6); // Reduced bounce intensity
-      var bounceOffset = Math.sin(this.bounceTime) * bounceIntensity;
-      var headX = this.x;
-      var headY = this.y + bounceOffset;
-      
+      var r = 4;
       ctx.beginPath();
       ctx.arc(
-        headX,
-        headY,
+        this.x,
+        this.y,
         r,
         Math.PI / 4 + this.absAngle,
         7 * Math.PI / 4 + this.absAngle
       );
       ctx.moveTo(
-        headX + r * Math.cos(7 * Math.PI / 4 + this.absAngle),
-        headY + r * Math.sin(7 * Math.PI / 4 + this.absAngle)
+        this.x + r * Math.cos(7 * Math.PI / 4 + this.absAngle),
+        this.y + r * Math.sin(7 * Math.PI / 4 + this.absAngle)
       );
       ctx.lineTo(
-        headX + r * Math.cos(this.absAngle) * 2 ** 0.5,
-        headY + r * Math.sin(this.absAngle) * 2 ** 0.5
+        this.x + r * Math.cos(this.absAngle) * 2 ** 0.5,
+        this.y + r * Math.sin(this.absAngle) * 2 ** 0.5
       );
       ctx.lineTo(
-        headX + r * Math.cos(Math.PI / 4 + this.absAngle),
-        headY + r * Math.sin(Math.PI / 4 + this.absAngle)
+        this.x + r * Math.cos(Math.PI / 4 + this.absAngle),
+        this.y + r * Math.sin(Math.PI / 4 + this.absAngle)
       );
       ctx.stroke();
-      
-      // Draw eyes fixed on head
-      var eyeDistance = r * 1.5;
-      var eyeSize = 10;
-      var pupilSize = 4;
-      
-      // Eyes positioned at fixed angles relative to head direction
-      var eye1X = headX + eyeDistance * Math.cos(this.absAngle + Math.PI / 6);
-      var eye1Y = headY + eyeDistance * Math.sin(this.absAngle + Math.PI / 6);
-      var eye2X = headX + eyeDistance * Math.cos(this.absAngle - Math.PI / 6);
-      var eye2Y = headY + eyeDistance * Math.sin(this.absAngle - Math.PI / 6);
-      
-      // Draw white eyes
-      ctx.fillStyle = "white";
-      ctx.beginPath();
-      ctx.arc(eye1X, eye1Y, eyeSize, 0, 2 * Math.PI);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(eye2X, eye2Y, eyeSize, 0, 2 * Math.PI);
-      ctx.fill();
-      
-      // Draw red pupils
-      ctx.fillStyle = "red";
-      ctx.beginPath();
-      ctx.arc(eye1X, eye1Y, pupilSize, 0, 2 * Math.PI);
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(eye2X, eye2Y, pupilSize, 0, 2 * Math.PI);
-      ctx.fill();
-      
       if (iter) {
         for (var i = 0; i < this.children.length; i++) {
           this.children[i].draw(true);
@@ -543,7 +504,7 @@ var Input = {
       s * 2,
       0.5,
       16,
-      3.0,
+      2,
       0.085,
       0.5,
       0.3
@@ -583,8 +544,9 @@ var Input = {
           var iii = 0;
           iii < 4;
           iii++ //fingers
-        ) 
+        ) {
           new Segment(node, s * 4, (iii / 3 - 0.5) * 1.571, 0.1, 4);
+        }
         new LegSystem(node, 3, s * 12, critter, 4);
       }
     }
